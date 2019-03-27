@@ -75,7 +75,7 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.h1}>Sharticles</Text>
-        <Image source={require('./assets/share.png')} style={styles.logo} />
+        <Image source={require('./share.png')} style={styles.logo} />
         <Button onPress={() => this.setModalVisible(true)} title={button} />
         <Modal animationType="slide" transparent={false} visible={modalVisible}>
           <View style={styles.modal}>
