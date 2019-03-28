@@ -8,7 +8,6 @@ import {
   TextInput,
   Text,
   Image,
-  ScrollView,
   Alert,
 } from 'react-native';
 
@@ -78,6 +77,15 @@ export default class App extends React.Component {
     });
   }
 
+  deleteArticle = id => {
+    const { posts } = this.state;
+    axios.delete(`http://192.168.1.14:3000/posts/${id}`).then(() => {
+      this.setState({
+        posts: posts.filter(post => post.id !== id),
+      });
+    });
+  };
+
   closeModal(visible) {
     this.setState({ modalVisible: visible });
   }
@@ -88,9 +96,11 @@ export default class App extends React.Component {
       title: url,
       description: 'description',
     };
-    axios.post('http://192.168.1.14:3000/posts', data).then(() => {
+    axios.post('http://192.168.1.14:3000/posts', data).then(post => {
+      const { posts } = this.state;
       this.setState({
         modalVisible: false,
+        posts: [...posts, post.data],
       });
     });
   }
@@ -98,46 +108,44 @@ export default class App extends React.Component {
   render() {
     const { button, modalVisible, url, posts } = this.state;
     return (
-      <ScrollView>
-        <View style={styles.container}>
-          <Text style={styles.h1}>Sharticles</Text>
-          {/* eslint-disable-next-line global-require */}
-          <Image source={require('./assets/share.png')} style={styles.logo} />
-          <Button onPress={() => this.closeModal(true)} title={button} />
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}
-          >
-            <View style={styles.modal}>
-              <View style={styles.closeModal}>
-                <Button
-                  onPress={() => {
-                    this.closeModal(!modalVisible);
-                  }}
-                  title="X"
-                />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter URL"
-                onChangeText={value => this.setState({ url: value })}
-                value={url}
+      <View style={styles.container}>
+        <Text style={styles.h1}>Sharticles</Text>
+        {/* eslint-disable-next-line global-require */}
+        <Image source={require('./assets/share.png')} style={styles.logo} />
+        <Button onPress={() => this.closeModal(true)} title={button} />
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+          }}
+        >
+          <View style={styles.modal}>
+            <View style={styles.closeModal}>
+              <Button
+                onPress={() => {
+                  this.closeModal(!modalVisible);
+                }}
+                title="X"
               />
-              <Button title="ok" onPress={() => this.validateUrl()} />
             </View>
-          </Modal>
-          <View style={styles.line} />
-          {posts.length !== 0 ? (
-            <Articles posts={posts} />
-          ) : (
-            <Text>Aucun article</Text>
-          )}
-        </View>
-      </ScrollView>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter URL"
+              onChangeText={value => this.setState({ url: value })}
+              value={url}
+            />
+            <Button title="ok" onPress={() => this.validateUrl()} />
+          </View>
+        </Modal>
+        <View style={styles.line} />
+        {posts.length !== 0 ? (
+          <Articles posts={posts} deleteArticle={this.deleteArticle} />
+        ) : (
+          <Text>Aucun article</Text>
+        )}
+      </View>
     );
   }
 }

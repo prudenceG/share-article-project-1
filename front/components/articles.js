@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Button } from 'react-native';
 
 const styles = StyleSheet.create({
   image: {
@@ -9,6 +9,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
   },
   container: {
+    marginBottom: 20,
+  },
+  containerArticle: {
     display: 'flex',
     flexDirection: 'row',
     shadowColor: '#000',
@@ -21,7 +24,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     width: '100%',
     backgroundColor: 'white',
-    marginBottom: 20,
   },
   blocText: {
     width: '60%',
@@ -39,17 +41,20 @@ const styles = StyleSheet.create({
 });
 
 const Article = props => {
-  const { posts } = props;
+  const { posts, deleteArticle } = props;
   return (
     <View>
       {posts &&
         posts.map(post => (
           <View key={post.id} style={styles.container}>
-            <Image style={styles.image} />
-            <View style={styles.blocText}>
-              <Text style={[styles.text, styles.title]}>{post.title}</Text>
-              <Text style={styles.text}>{post.description}</Text>
+            <View style={styles.containerArticle}>
+              <Image style={styles.image} />
+              <View style={styles.blocText}>
+                <Text style={[styles.text, styles.title]}>{post.title}</Text>
+                <Text style={styles.text}>{post.description}</Text>
+              </View>
             </View>
+            <Button onPress={() => deleteArticle(post.id)} title="supprimer" />
           </View>
         ))}
     </View>
