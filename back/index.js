@@ -30,13 +30,14 @@ low(adapter)
         .then(post => res.status(200).send(post));
     });
     // DELETE /posts
-    app.delete('/posts/:id/:name', (req, res) => {
+    app.delete('/posts/:id', (req, res) => {
       const { id } = req.params;
-      db.get('posts')
+      const post = db
+        .get('posts')
         .remove({ id })
         .write();
+      res.send('post deleted');
     });
-
     return db.defaults({}).write();
   })
 

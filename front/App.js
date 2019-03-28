@@ -8,6 +8,7 @@ import {
   TextInput,
   Text,
   Image,
+  ScrollView,
   Alert,
 } from 'react-native';
 
@@ -108,44 +109,46 @@ export default class App extends React.Component {
   render() {
     const { button, modalVisible, url, posts } = this.state;
     return (
-      <View style={styles.container}>
-        <Text style={styles.h1}>Sharticles</Text>
-        {/* eslint-disable-next-line global-require */}
-        <Image source={require('./assets/share.png')} style={styles.logo} />
-        <Button onPress={() => this.closeModal(true)} title={button} />
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}
-        >
-          <View style={styles.modal}>
-            <View style={styles.closeModal}>
-              <Button
-                onPress={() => {
-                  this.closeModal(!modalVisible);
-                }}
-                title="X"
+      <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.h1}>Sharticles</Text>
+          {/* eslint-disable-next-line global-require */}
+          <Image source={require('./assets/share.png')} style={styles.logo} />
+          <Button onPress={() => this.closeModal(true)} title={button} />
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}
+          >
+            <View style={styles.modal}>
+              <View style={styles.closeModal}>
+                <Button
+                  onPress={() => {
+                    this.closeModal(!modalVisible);
+                  }}
+                  title="X"
+                />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter URL"
+                onChangeText={value => this.setState({ url: value })}
+                value={url}
               />
+              <Button title="ok" onPress={() => this.validateUrl()} />
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter URL"
-              onChangeText={value => this.setState({ url: value })}
-              value={url}
-            />
-            <Button title="ok" onPress={() => this.validateUrl()} />
-          </View>
-        </Modal>
-        <View style={styles.line} />
-        {posts.length !== 0 ? (
-          <Articles posts={posts} deleteArticle={this.deleteArticle} />
-        ) : (
-          <Text>Aucun article</Text>
-        )}
-      </View>
+          </Modal>
+          <View style={styles.line} />
+          {posts.length !== 0 ? (
+            <Articles posts={posts} deleteArticle={this.deleteArticle} />
+          ) : (
+            <Text>Aucun article</Text>
+          )}
+        </View>
+      </ScrollView>
     );
   }
 }
