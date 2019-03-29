@@ -78,7 +78,16 @@ export default class App extends React.Component {
     });
   }
 
-  closeModal(visible) {
+  deleteArticle = id => {
+    const { posts } = this.state;
+    axios.delete(`http://192.168.1.14:3000/posts/${id}`).then(() => {
+      this.setState({
+        posts: posts.filter(post => post.id !== id),
+      });
+    });
+  };
+
+  toggleModal(visible) {
     this.setState({ modalVisible: visible });
   }
 
@@ -88,9 +97,11 @@ export default class App extends React.Component {
       title: url,
       description: 'description',
     };
-    axios.post('http://192.168.1.14:3000/posts', data).then(() => {
+    axios.post('http://192.168.1.14:3000/posts', data).then(post => {
+      const { posts } = this.state;
       this.setState({
         modalVisible: false,
+        posts: [...posts, post.data],
       });
     });
   }
@@ -98,12 +109,12 @@ export default class App extends React.Component {
   render() {
     const { button, modalVisible, url, posts } = this.state;
     return (
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.container}>
           <Text style={styles.h1}>Sharticles</Text>
           {/* eslint-disable-next-line global-require */}
           <Image source={require('./assets/share.png')} style={styles.logo} />
-          <Button onPress={() => this.closeModal(true)} title={button} />
+          <Button onPress={() => this.toggleModal(true)} title={button} />
           <Modal
             animationType="slide"
             transparent={false}
@@ -116,7 +127,7 @@ export default class App extends React.Component {
               <View style={styles.closeModal}>
                 <Button
                   onPress={() => {
-                    this.closeModal(!modalVisible);
+                    this.toggleModal(!modalVisible);
                   }}
                   title="X"
                 />
@@ -132,7 +143,7 @@ export default class App extends React.Component {
           </Modal>
           <View style={styles.line} />
           {posts.length !== 0 ? (
-            <Articles posts={posts} />
+            <Articles posts={posts} deleteArticle={this.deleteArticle} />
           ) : (
             <Text>Aucun article</Text>
           )}
