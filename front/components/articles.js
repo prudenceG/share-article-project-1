@@ -1,13 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Button,
-  TouchableHighlight,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 const styles = StyleSheet.create({
   bloc_image: {
@@ -51,12 +44,12 @@ const styles = StyleSheet.create({
 });
 
 const Article = props => {
-  const { posts, deleteArticle, modalViewVisible, toggleModalView } = props;
+  const { posts, modalViewVisible, toggleModalView } = props;
   return (
     <View>
       {posts &&
         posts.map(post => (
-          <TouchableHighlight
+          <TouchableOpacity
             key={post.id}
             onPress={() => toggleModalView(!modalViewVisible, post)}
           >
@@ -71,15 +64,10 @@ const Article = props => {
                 </View>
                 <View style={styles.blocText}>
                   <Text style={[styles.text, styles.title]}>{post.title}</Text>
-                  <Text style={styles.text}>{post.description}</Text>
                 </View>
               </View>
-              <Button
-                onPress={() => deleteArticle(post.id)}
-                title="supprimer"
-              />
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         ))}
     </View>
   );

@@ -91,10 +91,11 @@ export default class App extends React.Component {
     });
   }
 
-  deleteArticle = id => {
+  deleteArticle = (id, visible) => {
     const { posts } = this.state;
     axios.delete(`${URL}/posts/${id}`).then(() => {
       this.setState({
+        modalViewVisible: visible,
         posts: posts.filter(post => post.id !== id),
       });
     });
@@ -158,7 +159,6 @@ export default class App extends React.Component {
           {posts.length !== 0 ? (
             <Articles
               posts={posts}
-              deleteArticle={this.deleteArticle}
               modalViewVisible={modalViewVisible}
               toggleModalView={this.toggleModalView}
             />
@@ -178,6 +178,7 @@ export default class App extends React.Component {
           modalViewVisible={modalViewVisible}
           toggleModalView={this.toggleModalView}
           post={post}
+          deleteArticle={this.deleteArticle}
         />
       </ScrollView>
     );

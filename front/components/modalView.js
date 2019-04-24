@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
 });
 const ModalView = props => {
-  const { modalViewVisible, toggleModalView, post } = props;
+  const { modalViewVisible, toggleModalView, post, deleteArticle } = props;
   return (
     <View>
       <Modal
@@ -78,6 +78,12 @@ const ModalView = props => {
             <Text style={styles.text}>{post.description}</Text>
           </View>
         </View>
+        <Button
+          onPress={() => deleteArticle(post.id, !modalViewVisible)}
+          title="Supprimer"
+        />
+        <Button title="Voir l'article" />
+        <Button title="Ajouter aux favoris" />
       </Modal>
     </View>
   );
@@ -87,6 +93,7 @@ ModalView.propTypes = {
   modalViewVisible: PropTypes.bool.isRequired,
   toggleModalView: PropTypes.func.isRequired,
   post: PropTypes.object.isRequired,
+  deleteArticle: PropTypes.func.isRequired,
 };
 
 export default ModalView;
