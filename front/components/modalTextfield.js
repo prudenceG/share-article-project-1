@@ -81,7 +81,7 @@ const ModalTextfield = props => {
 };
 
 ModalTextfield.propTypes = {
-  currentPosts: PropTypes.object.isRequired,
+  currentPosts: PropTypes.array.isRequired,
   url: PropTypes.string.isRequired,
   toggleModal: PropTypes.func.isRequired,
   modalVisible: PropTypes.bool.isRequired,
