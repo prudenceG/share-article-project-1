@@ -1,19 +1,29 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Button,
+  TouchableHighlight,
+} from 'react-native';
 
 const styles = StyleSheet.create({
+  bloc_image: {
+    backgroundColor: 'grey',
+  },
   image: {
-    width: '40%',
-    height: 150,
-    backgroundColor: 'gray',
+    width: '100%',
+    minHeight: 150,
   },
   container: {
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 10,
   },
   containerArticle: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     shadowColor: '#000',
     shadowOffset: {
       width: 1,
@@ -22,40 +32,54 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 1,
     elevation: 2,
-    width: '100%',
     backgroundColor: 'white',
   },
   blocText: {
-    width: '60%',
     padding: 10,
   },
   text: {
-    fontSize: 18,
-    width: '100%',
+    fontSize: 16,
   },
   title: {
     fontWeight: 'bold',
     color: '#ef5023',
-    fontSize: 20,
+    fontSize: 18,
+  },
+  closeView: {
+    marginTop: 60,
   },
 });
 
 const Article = props => {
-  const { posts, deleteArticle } = props;
+  const { posts, deleteArticle, modalViewVisible, toggleModalView } = props;
   return (
     <View>
       {posts &&
         posts.map(post => (
-          <View key={post.id} style={styles.container}>
-            <View style={styles.containerArticle}>
-              <Image style={styles.image} />
-              <View style={styles.blocText}>
-                <Text style={[styles.text, styles.title]}>{post.title}</Text>
-                <Text style={styles.text}>{post.description}</Text>
+          <TouchableHighlight
+            key={post.id}
+            onPress={() => toggleModalView(!modalViewVisible, post)}
+          >
+            <View style={styles.container}>
+              <View style={styles.containerArticle}>
+                <View style={styles.bloc_image}>
+                  <Image
+                    style={styles.image}
+                    source={{ uri: post.imageURL }}
+                    alt={post.title}
+                  />
+                </View>
+                <View style={styles.blocText}>
+                  <Text style={[styles.text, styles.title]}>{post.title}</Text>
+                  <Text style={styles.text}>{post.description}</Text>
+                </View>
               </View>
+              <Button
+                onPress={() => deleteArticle(post.id)}
+                title="supprimer"
+              />
             </View>
-            <Button onPress={() => deleteArticle(post.id)} title="supprimer" />
-          </View>
+          </TouchableHighlight>
         ))}
     </View>
   );

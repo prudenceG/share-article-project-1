@@ -4,15 +4,18 @@ import {
   StyleSheet,
   Button,
   View,
-  Modal,
-  TextInput,
   Text,
   Image,
   ScrollView,
-  Alert,
 } from 'react-native';
 
 import Articles from './components/articles';
+import ModalTextfield from './components/modalTextfield';
+import ModalView from './components/modalView';
+
+const IP = '192.168.1.232';
+const PORT = 3000;
+const URL = `http://${IP}:${PORT}`;
 
 const styles = StyleSheet.create({
   container: {
@@ -60,6 +63,13 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 20,
   },
+  bloc_image: {
+    backgroundColor: 'grey',
+  },
+  image: {
+    width: '100%',
+    minHeight: 150,
+  },
 });
 
 export default class App extends React.Component {
@@ -68,10 +78,13 @@ export default class App extends React.Component {
     modalVisible: false,
     url: '',
     posts: [],
+    post: {},
+    currentPost: [],
+    modalViewVisible: false,
   };
 
   componentDidMount() {
-    axios.get('http://192.168.1.14:3000/posts').then(results => {
+    axios.get(`${URL}/posts`).then(results => {
       this.setState({
         posts: results.data,
       });
@@ -80,34 +93,59 @@ export default class App extends React.Component {
 
   deleteArticle = id => {
     const { posts } = this.state;
-    axios.delete(`http://192.168.1.14:3000/posts/${id}`).then(() => {
+    axios.delete(`${URL}/posts/${id}`).then(() => {
       this.setState({
         posts: posts.filter(post => post.id !== id),
       });
     });
   };
 
-  toggleModal(visible) {
-    this.setState({ modalVisible: visible });
-  }
+  toggleModal = visible => {
+    this.setState({
+      modalVisible: visible,
+      currentPost: [],
+    });
+  };
 
-  validateUrl() {
-    const { url } = this.state;
-    const data = {
-      title: url,
-      description: 'description',
-    };
-    axios.post('http://192.168.1.14:3000/posts', data).then(post => {
-      const { posts } = this.state;
+  toggleModalView = (visible, post) => {
+    this.setState({
+      post,
+      modalViewVisible: visible,
+    });
+  };
+
+  handleChange = url => {
+    this.setState({
+      url,
+    });
+    axios.post(`${URL}/post`, { url }).then(currentPost => {
+      this.setState({
+        currentPost: [{ ...currentPost.data, id: '123456' }],
+      });
+    });
+  };
+
+  validateUrl = () => {
+    const { url, posts } = this.state;
+    axios.post(`${URL}/posts`, { url }).then(post => {
       this.setState({
         modalVisible: false,
         posts: [...posts, post.data],
+        currentPost: [],
       });
     });
-  }
+  };
 
   render() {
-    const { button, modalVisible, url, posts } = this.state;
+    const {
+      button,
+      modalVisible,
+      url,
+      posts,
+      post,
+      currentPost,
+      modalViewVisible,
+    } = this.state;
     return (
       <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.container}>
@@ -115,39 +153,32 @@ export default class App extends React.Component {
           {/* eslint-disable-next-line global-require */}
           <Image source={require('./assets/share.png')} style={styles.logo} />
           <Button onPress={() => this.toggleModal(true)} title={button} />
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}
-          >
-            <View style={styles.modal}>
-              <View style={styles.closeModal}>
-                <Button
-                  onPress={() => {
-                    this.toggleModal(!modalVisible);
-                  }}
-                  title="X"
-                />
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter URL"
-                onChangeText={value => this.setState({ url: value })}
-                value={url}
-              />
-              <Button title="ok" onPress={() => this.validateUrl()} />
-            </View>
-          </Modal>
+
           <View style={styles.line} />
           {posts.length !== 0 ? (
-            <Articles posts={posts} deleteArticle={this.deleteArticle} />
+            <Articles
+              posts={posts}
+              deleteArticle={this.deleteArticle}
+              modalViewVisible={modalViewVisible}
+              toggleModalView={this.toggleModalView}
+            />
           ) : (
             <Text>Aucun article</Text>
           )}
         </View>
+        <ModalTextfield
+          currentPosts={currentPost}
+          url={url}
+          toggleModal={this.toggleModal}
+          modalVisible={modalVisible}
+          handleChange={this.handleChange}
+          validateUrl={this.validateUrl}
+        />
+        <ModalView
+          modalViewVisible={modalViewVisible}
+          toggleModalView={this.toggleModalView}
+          post={post}
+        />
       </ScrollView>
     );
   }
