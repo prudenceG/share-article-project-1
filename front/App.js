@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   ScrollView,
+  Linking,
 } from 'react-native';
 
 import Articles from './components/articles';
@@ -19,34 +20,11 @@ const URL = `http://${IP}:${PORT}`;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 60,
+    marginTop: 40,
     display: 'flex',
     flex: 1,
     alignItems: 'center',
     padding: 20,
-  },
-  closeModal: {
-    display: 'flex',
-    alignItems: 'flex-end',
-  },
-  modal: {
-    backgroundColor: '#7addff',
-    height: '100%',
-    paddingTop: 30,
-    paddingRight: 20,
-    paddingLeft: 20,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  input: {
-    height: 50,
-    borderRadius: 8,
-    borderColor: 'transparent',
-    borderWidth: 1,
-    width: '100%',
-    margin: 'auto',
-    backgroundColor: 'white',
-    padding: 7,
   },
   line: {
     height: 1,
@@ -62,13 +40,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 20,
-  },
-  bloc_image: {
-    backgroundColor: 'grey',
-  },
-  image: {
-    width: '100%',
-    minHeight: 150,
   },
 });
 
@@ -137,6 +108,14 @@ export default class App extends React.Component {
     });
   };
 
+  handleClickOpenUrl = url => {
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      }
+    });
+  };
+
   render() {
     const {
       button,
@@ -179,6 +158,7 @@ export default class App extends React.Component {
           toggleModalView={this.toggleModalView}
           post={post}
           deleteArticle={this.deleteArticle}
+          handleClickOpenUrl={this.handleClickOpenUrl}
         />
       </ScrollView>
     );
