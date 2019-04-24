@@ -38,9 +38,6 @@ const styles = StyleSheet.create({
     color: '#ef5023',
     fontSize: 18,
   },
-  closeView: {
-    marginTop: 60,
-  },
 });
 
 const Article = props => {
