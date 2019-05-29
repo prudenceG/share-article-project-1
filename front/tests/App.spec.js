@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 // mock permet de tester son environnement sans lancer le fetch par exemple
 import { Button } from 'react-native';
 
-import App from '../App';
+import App from '../home';
 
 describe('button', () => {
   it('button exists with text "Ajouter un article"', () => {
