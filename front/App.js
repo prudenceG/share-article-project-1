@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f4c741',
   },
   iconTab: {
-    marginTop: 20,
+    marginTop: 10,
   },
 });
 

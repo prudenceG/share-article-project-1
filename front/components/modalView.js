@@ -60,7 +60,15 @@ const styles = StyleSheet.create({
   },
 });
 const ModalView = props => {
-  const { modalViewVisible, toggleModalView, post, handleClickOpenUrl } = props;
+  const {
+    modalViewVisible,
+    toggleModalView,
+    post,
+    handleClickOpenUrl,
+    addToFavorites,
+    favorites,
+    deleteToFavorites,
+  } = props;
   return (
     <View>
       <Modal
@@ -91,10 +99,6 @@ const ModalView = props => {
               <Text style={styles.text}>{post.description}</Text>
             </View>
           </View>
-          {/* <Button
-            onPress={() => deleteArticle(post.id, !modalViewVisible)}
-            title="Supprimer"
-          /> */}
           <View style={styles.blocButton}>
             <View style={styles.button}>
               <Button
@@ -102,9 +106,22 @@ const ModalView = props => {
                 title="Voir l'article"
               />
             </View>
-            <View>
-              <Button title="Ajouter aux favoris" />
-            </View>
+            {favorites &&
+            favorites.find(favorite => favorite.id === post.id) ? (
+              <View>
+                <Button
+                  title="Supprimer des favoris"
+                  onPress={() => deleteToFavorites(post.id)}
+                />
+              </View>
+            ) : (
+              <View>
+                <Button
+                  title="Ajouter aux favoris"
+                  onPress={() => addToFavorites(post.id)}
+                />
+              </View>
+            )}
           </View>
         </View>
       </Modal>
@@ -117,6 +134,10 @@ ModalView.propTypes = {
   toggleModalView: PropTypes.func.isRequired,
   post: PropTypes.object.isRequired,
   handleClickOpenUrl: PropTypes.func.isRequired,
+  addToFavorites: PropTypes.func.isRequired,
+  favorites: PropTypes.array.isRequired,
+  deleteToFavorites: PropTypes.func.isRequired,
+  find: PropTypes.func.isRequired,
 };
 
 export default ModalView;

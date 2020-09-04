@@ -6,47 +6,81 @@ const db = low(adapter);
 const getPosts = () => {
   return db.get('posts').value();
 };
+
+const getPostsById = postId => {
+  return db
+    .get('posts')
+    .find({ id: postId })
+    .value();
+};
 const findPostByUrl = url => {
   return getPosts().find(post => post.url === url);
-}
+};
 
 const createPost = properties => {
   return db
     .get('posts')
     .push(properties)
     .last()
-    .assign({id: Date.now().toString()})
+    .assign({ id: Date.now().toString() })
     .write();
 };
 
-const deletePost = (id) => {
+const addPost = (addFavorites, userId) => {
+  return db
+    .get('users')
+    .find({ id: userId })
+    .assign({ favorites: addFavorites })
+    .write();
+};
+
+const deleteFavorite = (newFavorites, userId) => {
+  return db
+    .get('users')
+    .find({ id: userId })
+    .assign({ favorites: newFavorites })
+    .write();
+};
+
+const deletePost = id => {
   return db
     .get('posts')
     .remove({ id })
     .write();
 };
 
-const findUserByEmail = (email) => {
+const findUserByEmail = email => {
   return db
     .get('users')
     .value()
-    .find(user => user.email === email)
-}
+    .find(user => user.email === email);
+};
 
-const createUser = (user) => {
+const findUserById = id => {
+  return db
+    .get('users')
+    .value()
+    .find(user => user.id === id);
+};
+
+const createUser = user => {
   return db
     .get('users')
     .push(user)
     .last()
-    .assign({id: Date.now().toString()})
+    .assign({ id: Date.now().toString() })
     .write();
-}
+};
 
 module.exports = {
+  addPost,
   createPost,
-  findPostByUrl,
-  getPosts,
-  deletePost,
   createUser,
-  findUserByEmail
+  deletePost,
+  findPostByUrl,
+  findUserByEmail,
+  findUserById,
+  getPosts,
+  getPostsById,
+  deleteFavorite,
 };

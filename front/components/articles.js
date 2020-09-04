@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Icon } from 'react-native-elements';
 
 const styles = StyleSheet.create({
   bloc_image: {
@@ -9,6 +10,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     minHeight: 150,
+    zIndex: -1000,
   },
   container: {
     marginBottom: 10,
@@ -38,10 +40,22 @@ const styles = StyleSheet.create({
     color: '#ef5023',
     fontSize: 18,
   },
+  favorite: {
+    position: 'absolute',
+    right: 0,
+    padding: 5,
+    zIndex: 1000,
+  },
 });
 
 const Article = props => {
-  const { posts, modalViewVisible, toggleModalView } = props;
+  const {
+    posts,
+    modalViewVisible,
+    toggleModalView,
+    favoritesId,
+    idUser,
+  } = props;
   return (
     <View>
       {posts &&
@@ -61,8 +75,21 @@ const Article = props => {
                 </View>
                 <View style={styles.blocText}>
                   <Text style={[styles.text, styles.title]}>{post.title}</Text>
+                  {idUser && idUser === post.idUser ? (
+                    <Text>Article publié par: vous</Text>
+                  ) : (
+                    <Text>{`Article publié par: ${post.pseudoUser}`}</Text>
+                  )}
                 </View>
               </View>
+              {favoritesId &&
+              favoritesId.find(favorite => favorite === post.id) ? (
+                <View style={styles.favorite}>
+                  <Icon name="star" size={20} color="yellow" />
+                </View>
+              ) : (
+                <Icon />
+              )}
             </View>
           </TouchableOpacity>
         ))}
