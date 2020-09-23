@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
 import {
   View,
   Text,
@@ -24,22 +26,66 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+const mapStateToProps = state => {
+  return {
+    posts: state.posts,
+  };
+};
+
 class Favorites extends Component {
   state = {
     favorites: [],
+    favoritesId: [],
     post: {},
+    filteredPosts: [],
     modalViewVisible: false,
     idUser: '',
   };
 
   async componentDidMount() {
     this.getFavorites();
+    this.getFavoritesId();
     this.getIdUser();
+    this.filterPosts();
   }
+
+  filterPosts = async () => {
+    const favoritesId = await this.getFavoritesId();
+    const { posts } = this.props;
+    const allPosts = posts
+      .map(post => {
+        const postAsFavorite = favoritesId.find(
+          favoriteId => favoriteId === post.id
+        );
+
+        if (!postAsFavorite) {
+          return post;
+        }
+
+        return undefined;
+      })
+      .filter(post => post !== undefined);
+    this.setState({
+      filteredPosts: allPosts,
+    });
+  };
+
+  getFavoritesId = async () => {
+    const favoritesId = await AsyncStorage.getItem('favoritesId');
+    const userFavoritesId = await JSON.parse(favoritesId);
+
+    this.setState({
+      favoritesId: userFavoritesId,
+    });
+
+    return userFavoritesId;
+  };
 
   getFavorites = async () => {
     const favoris = await AsyncStorage.getItem('favorites');
     const userFavorites = await JSON.parse(favoris);
+
     this.setState({
       favorites: userFavorites,
     });
@@ -88,8 +134,16 @@ class Favorites extends Component {
   };
 
   render() {
-    const { favorites, modalViewVisible, post, idUser } = this.state;
-    const { navigation } = this.props;
+    const {
+      favorites,
+      modalViewVisible,
+      post,
+      idUser,
+      favoritesId,
+      filteredPosts,
+    } = this.state;
+    const { navigation, posts } = this.props;
+
     navigation.addListener('didFocus', () => {
       this.getFavorites();
     });
@@ -108,7 +162,22 @@ class Favorites extends Component {
           ) : (
             <Text>Aucun Favoris</Text>
           )}
+          <Text style={styles.title}>
+            Ces articles pourraient vous intéresser
+          </Text>
+          {posts.length !== 0 ? (
+            <Articles
+              posts={filteredPosts}
+              modalViewVisible={modalViewVisible}
+              toggleModalView={this.toggleModalView}
+              favoritesId={favoritesId}
+              idUser={idUser}
+            />
+          ) : (
+            <Text>Aucun article</Text>
+          )}
         </View>
+
         <ModalView
           modalViewVisible={modalViewVisible}
           toggleModalView={this.toggleModalView}
@@ -122,9 +191,10 @@ class Favorites extends Component {
   }
 }
 
-export default Favorites;
+export default connect(mapStateToProps)(Favorites);
 
 Favorites.propTypes = {
   navigation: PropTypes.object.isRequired,
   addListener: PropTypes.func.isRequired,
+  posts: PropTypes.array.isRequired,
 };

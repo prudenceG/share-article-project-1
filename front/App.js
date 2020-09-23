@@ -1,8 +1,10 @@
 /* eslint-disable react/prop-types */
 import { createBottomTabNavigator, createAppContainer } from 'react-navigation';
-import React from 'react';
+import React, { Component } from 'react';
+import { Provider } from 'react-redux';
 import { StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
+import store from './store';
 import Home from './home';
 import Favorites from './favorites';
 
@@ -56,4 +58,14 @@ export const Tabs = createBottomTabNavigator({
   },
 });
 
-export default createAppContainer(Tabs);
+const AppContainer = createAppContainer(Tabs);
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <AppContainer />
+      </Provider>
+    );
+  }
+}

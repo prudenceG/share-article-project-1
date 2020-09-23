@@ -32,10 +32,14 @@
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-screens": "^2.10.1",
-    "react-navigation": "^3.13.0"
+    "react-navigation": "^3.13.0",
+    "react-redux": "^7.2.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "babel-preset-expo": "^8.0.0"
+    "babel-preset-expo": "^8.0.0",
+    "react-devtools": "^3.6.3"
   },
   "private": true,
   "husky": {

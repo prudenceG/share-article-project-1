@@ -1,6 +1,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import {
   View,
@@ -21,7 +22,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class Authentication extends React.Component {
+const mapStateToProps = state => {
+  return {
+    authentication: state.authentication,
+  };
+};
+
+class Authentication extends Component {
   state = {
     email: '',
     password: '',
@@ -44,6 +51,7 @@ export default class Authentication extends React.Component {
       email,
       password,
     };
+
     axios
       .post(`${URL}/login`, data)
       .then(async token => {
@@ -59,14 +67,14 @@ export default class Authentication extends React.Component {
   };
 
   render() {
-    const { modalAuthVisible } = this.props;
+    const { authentication } = this.props;
     const { email, password } = this.state;
 
     return (
       <Modal
         animationType="slide"
         transparent={false}
-        visible={modalAuthVisible}
+        visible={authentication}
         onRequestClose={() => {
           Alert.alert('Modal has been closed.');
         }}
@@ -88,3 +96,5 @@ export default class Authentication extends React.Component {
     );
   }
 }
+
+export default connect(mapStateToProps)(Authentication);

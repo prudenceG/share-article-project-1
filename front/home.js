@@ -13,12 +13,19 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 
+import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import Articles from './components/articles';
 import ModalTextfield from './components/modalTextfield';
 import ModalView from './components/modalView';
 import Authentication from './components/authentication';
 import { URL } from './constants';
+import { fetchArticles } from './store/actions/fetchArticles';
+import {
+  authenticationViewHidden,
+  authenticationViewVisible,
+} from './store/actions/authenticationVisible';
 
 const styles = StyleSheet.create({
   scroll_view: {
@@ -82,7 +89,23 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class Home extends React.Component {
+const mapStateToProps = state => {
+  return {
+    posts: state.posts,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatchFetchArticles: () => dispatch(fetchArticles(dispatch)),
+    dispatchAuthenticationViewVisible: () =>
+      dispatch(authenticationViewVisible()),
+    dispatchAuthenticationViewHidden: () =>
+      dispatch(authenticationViewHidden()),
+  };
+};
+
+class Home extends React.Component {
   state = {
     modalVisible: false,
     url: '',
@@ -90,7 +113,6 @@ export default class Home extends React.Component {
     post: {},
     currentPost: [],
     modalViewVisible: false,
-    authentication: false,
     favorites: [],
     favoritesId: [],
     idUser: '',
@@ -102,28 +124,10 @@ export default class Home extends React.Component {
     this.getIdUser();
   }
 
-  async getPosts(toto) {
-    console.log(toto);
-    const token = await this.getStorage('token');
-    const id = await this.getStorage('idUser');
-    axios({
-      method: 'GET',
-      url: `${URL}/posts/${id}`,
-      headers: {
-        Autorization: `Bearer ${token}`,
-      },
-    })
-      .then(results => {
-        this.setState({
-          posts: results.data,
-        });
-      })
-      .catch(err => {
-        this.setState({
-          authentication: true,
-        });
-        console.log('err', err);
-      });
+  getPosts() {
+    const { dispatchFetchArticles } = this.props;
+
+    dispatchFetchArticles();
   }
 
   async getFavorites() {
@@ -176,11 +180,17 @@ export default class Home extends React.Component {
     });
   };
 
-  toggleModalAuth = visible => {
+  toggleModalAuth = (visible = true) => {
     this.getPosts();
-    this.setState({
-      authentication: visible,
-    });
+
+    const {
+      dispatchAuthenticationViewVisible,
+      dispatchAuthenticationViewHidden,
+    } = this.props;
+
+    return visible
+      ? dispatchAuthenticationViewVisible()
+      : dispatchAuthenticationViewHidden();
   };
 
   handleChange = url => {
@@ -255,12 +265,13 @@ export default class Home extends React.Component {
   };
 
   deleteStorage = async () => {
+    const { dispatchAuthenticationViewVisible } = this.props;
+
     await AsyncStorage.removeItem('idUser');
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('favorites');
-    this.setState({
-      authentication: true,
-    });
+
+    dispatchAuthenticationViewVisible();
   };
 
   successfulConnexion = valid => {
@@ -272,7 +283,6 @@ export default class Home extends React.Component {
 
   getIdUser = async () => {
     const idUser = await AsyncStorage.getItem('idUser');
-    console.log(idUser);
     this.setState({
       idUser,
     });
@@ -293,20 +303,19 @@ export default class Home extends React.Component {
     const {
       modalVisible,
       url,
-      posts,
       post,
       currentPost,
       modalViewVisible,
-      authentication,
       favoritesId,
       favorites,
       idUser,
     } = this.state;
-    const { navigation } = this.props;
+    const { navigation, posts } = this.props;
+
     navigation.addListener('didFocus', () => {
-      console.log('call to getFavorites()');
       this.reloadFavorites();
     });
+
     return (
       <ScrollView style={styles.scroll_view} keyboardShouldPersistTaps="always">
         <View style={styles.container}>
@@ -368,7 +377,6 @@ export default class Home extends React.Component {
           deleteToFavorites={this.deleteToFavorites}
         />
         <Authentication
-          modalAuthVisible={authentication}
           toggleModalAuth={this.toggleModalAuth}
           successfulConnexion={this.successfulConnexion}
           getIdUser={this.getIdUser}
@@ -378,7 +386,17 @@ export default class Home extends React.Component {
   }
 }
 
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
+
 Home.propTypes = {
   navigation: PropTypes.object.isRequired,
-  addListener: PropTypes.func.isRequired,
+  addListener: PropTypes.func,
+  dispatchFetchArticles: PropTypes.func.isRequired,
+  dispatchAuthenticationViewVisible: PropTypes.func.isRequired,
+  dispatchAuthenticationViewHidden: PropTypes.func.isRequired,
+  posts: PropTypes.array.isRequired,
+};
+
+Home.defaultProps = {
+  addListener: null,
 };

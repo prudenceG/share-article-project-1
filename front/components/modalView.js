@@ -137,7 +137,6 @@ ModalView.propTypes = {
   addToFavorites: PropTypes.func.isRequired,
   favorites: PropTypes.array.isRequired,
   deleteToFavorites: PropTypes.func.isRequired,
-  find: PropTypes.func.isRequired,
 };
 
 export default ModalView;
